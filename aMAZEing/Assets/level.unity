@@ -1640,8 +1640,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e411b13a9cc62d4d9d9d688c8d5724a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 32
-  length: 32
+  width: 24
+  length: 24
   storey_height: 2.5
   virus_speed: 3
   fps_prefab: {fileID: 100006, guid: c6453f8e1f814744d8b94e5a6d1f9942, type: 3}

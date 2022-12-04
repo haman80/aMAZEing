@@ -45,8 +45,9 @@ public class Level : MonoBehaviour
     private int function_calls = 0;          // number of function calls during backtracking for solving the CSP
     private int num_viruses = 0;             // number of viruses in the level
     private List<int[]> pos_viruses;         // stores their location in the grid
-     private int num_drugs = 0;             
-    private List<int[]> pos_drugs;         
+    private int num_drugs = 0;             
+    private List<int[]> pos_drugs;    
+    private int num_drugs_collected = 0;     
     private int[,] dist;
     private List<GameObject> obj;
     private List<TileType>[,] gridSol = null;
@@ -88,6 +89,7 @@ public class Level : MonoBehaviour
         virus_landed_on_player_recently = false;
         drug_landed_on_player_recently = false;
         player_entered_house = false;  
+        num_drugs_collected = 0;   
         cam.GetComponent<AudioListener>().enabled = false;    
         dist = new int[width, length];
         obj = new List<GameObject>();
@@ -391,19 +393,6 @@ public class Level : MonoBehaviour
             lee_again = lee;
         }
 
-
-        // *** YOU NEED TO COMPLETE THIS PART OF THE FUNCTION  ***
-        // implement an algorithm that checks whether
-        // all paths between the player at (wr,lr) and the exit (wee, lee)
-        // are blocked by walls. i.e., there's no way to get to the exit!
-        // if this is the case, you must guarantee that there is at least 
-        // one accessible path (any path) from the initial player position to the exit
-        // by removing a few wall blocks (removing all of them is not acceptable!)
-        // this is done as a post-processing step after the CSP solution.
-        // It might be case that some constraints might be violated by this
-        // post-processing step - this is OK.
-        
-        /*** implement what is described above ! */
         for(int i = 0; i < width; i++) {
             for(int j = 0; j < length; j++) {
                 dist[i, j] = int.MaxValue;
@@ -472,7 +461,6 @@ public class Level : MonoBehaviour
                     continue;
 
                 float y = bounds.min[1];
-                //Debug.Log(w + " " + l + " " + h);
                 if ((w == wee) && (l == lee)) // this is the exit
                 {
                     GameObject house = Instantiate(house_prefab, new Vector3(0, 0, 0), Quaternion.identity);
@@ -548,7 +536,7 @@ public class Level : MonoBehaviour
 
             return;
         }
-        if (player_entered_house) // the player suceeds here, variable manipulated by House.cs
+        if (player_entered_house && num_drugs_collected == num_drugs) // the player suceeds here, variable manipulated by House.cs
         {
             Object.Destroy(fps_player_obj);
             cam.GetComponent<AudioListener>().enabled = true;
@@ -556,6 +544,9 @@ public class Level : MonoBehaviour
             Cursor.visible = true;
             PlayAgain.Active();
             return;
+        }
+        else if (player_entered_house && num_drugs_collected != num_drugs) {
+            text_box.GetComponent<Text>().text = "Didn't collect every drug!";
         }
 
         // virus hits the players (boolean variable is manipulated by Virus.cs)
@@ -572,6 +563,7 @@ public class Level : MonoBehaviour
         {
             player_health += Random.Range(0.25f, 0.75f);
             player_health = Mathf.Min(player_health, 1.0f);
+            num_drugs_collected++;
             drug_landed_on_player_recently = false;
             virus_landed_on_player_recently = false;
         }
@@ -590,8 +582,6 @@ public class Level : MonoBehaviour
             cb.disabledColor = new Color(0.0f, 1.0f, 0.25f);
             scroll_bar.GetComponent<Scrollbar>().colors = cb;
         }
-
-        /*** implement the rest ! */
     }
 
     public void TryAgain() {
