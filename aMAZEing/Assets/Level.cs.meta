@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 1e411b13a9cc62d4d9d9d688c8d5724a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - fps_prefab: {instanceID: 0}
+  - virus_prefab: {instanceID: 0}
+  - water_prefab: {instanceID: 0}
+  - house_prefab: {instanceID: 0}
+  - text_box: {instanceID: 0}
+  - scroll_bar: {instanceID: 0}
+  - infected: {instanceID: 0}
+  - damage: {instanceID: 0}
+  - pooled: {fileID: 8300000, guid: adf4e7fa93007bd49937217a0922f285, type: 3}
+  - drug: {instanceID: 0}
+  - exit: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
