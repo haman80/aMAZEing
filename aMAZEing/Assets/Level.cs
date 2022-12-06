@@ -126,8 +126,9 @@ public class Level : MonoBehaviour
                             while (true) {
                                 int dwr = Random.Range(-1, 1);
                                 int dlr = Random.Range(-1, 1);
-
-                                if(grid[wr + dwr, lr + dlr] == null) {
+                                if((dwr == -1 && dlr == -1) || (dwr == 1 && dlr == 1) || (dwr == 1 && dlr == -1) || (dwr == -1 && dlr == 1))
+                                    continue;
+                                if(wr+dwr > 0 && wr+dwr < width-1 && lr + dlr > 0 && lr + dlr < length-1 && grid[wr + dwr, lr + dlr] == null) {
                                     grid[wr + dwr, lr + dlr] = new List<TileType> { TileType.DRUG };
                                     pos_drugs.Add(new int[2] { wr+dwr, lr+dlr });
                                     break;
@@ -211,17 +212,17 @@ public class Level : MonoBehaviour
 
     bool TooLongWall(List<TileType>[,] grid)
     {
-        for(int w = 0; w < width; w++) {
-            for(int l = 0; l < length; l++) {
-                if(grid[w, l].Count == 1 && grid[w, l][0] == TileType.WALL) {
-                    if (w == 0 || l == 0 || w == width - 1 || l == length - 1)
-                        continue;
-                    if((w+1 < width-1 && w-1 > 0 && grid[w+1, l][0] == TileType.WALL && grid[w-1, l][0] == TileType.WALL) || (l+1 < length-1 && l-1 > 0 && grid[w, l+1][0] == TileType.WALL && grid[w, l-1][0] == TileType.WALL)) {
-                        return true;
-                    }
-                }
-            }
-        }
+        // for(int w = 0; w < width; w++) {
+        //     for(int l = 0; l < length; l++) {
+        //         if(grid[w, l].Count == 1 && grid[w, l][0] == TileType.WALL) {
+        //             if (w == 0 || l == 0 || w == width - 1 || l == length - 1)
+        //                 continue;
+        //             if((w+1 < width-1 && w-1 > 0 && grid[w+1, l][0] == TileType.WALL && grid[w-1, l][0] == TileType.WALL) || (l+1 < length-1 && l-1 > 0 && grid[w, l+1][0] == TileType.WALL && grid[w, l-1][0] == TileType.WALL)) {
+        //                 return true;
+        //             }
+        //         }
+        //     }
+        // }
         return false;
     }
 
@@ -234,7 +235,7 @@ public class Level : MonoBehaviour
             if(grid[w, l][0] == TileType.VIRUS) {
                 for(int i = -1; i <= 1; i++) {
                     for(int j = -1; j <= 1; j++) {
-                        if(i == 0 && j == 0)
+                        if(i == 0 && j == 0 || (i == -1 && j == -1) || (i == 1 && j == 1) || (i == 1 && j == -1) || (i == -1 && j == 1))
                             continue;
                         if(w+i >= 0 && l+j >= 0 && w+i < width && l+j < length && grid[w, l].Count == 1 && grid[w+i,l+j][0] == TileType.WALL) {
                             noWall = false;
@@ -268,7 +269,6 @@ public class Level : MonoBehaviour
     }
 
 
-    // *** YOU NEED TO COMPLETE THIS FUNCTION  ***
     // implement backtracking 
     bool BackTrackingSearch(List<TileType>[,] grid, List<int[]> unassigned)
     {
@@ -448,6 +448,19 @@ public class Level : MonoBehaviour
             prevNode = prev[prevNode[0][0], prevNode[0][1]];
         }
 
+        for(int i = 0; i < pos_drugs.Count; i++) {
+            minWallPath = dist[pos_drugs[i][0], pos_drugs[i][1]];
+            prevNode = prev[pos_drugs[i][0], pos_drugs[i][1]];
+            while(minWallPath != 0) {
+                if(solution[prevNode[0][0], prevNode[0][1]][0] == TileType.WALL) {
+                    solution[prevNode[0][0], prevNode[0][1]] = new List<TileType> { TileType.FLOOR };
+                    minWallPath--;
+                }
+                if(prevNode[0][0] == wr && prevNode[0][1] == lr) break;
+                prevNode = prev[prevNode[0][0], prevNode[0][1]];
+        }
+        }
+
         // the rest of the code creates the scenery based on the grid state 
         // you don't need to modify this code (unless you want to replace the virus
         // or other prefabs with something else you like)
@@ -547,6 +560,7 @@ public class Level : MonoBehaviour
         }
         else if (player_entered_house && num_drugs_collected != num_drugs) {
             text_box.GetComponent<Text>().text = "Didn't collect every drug!";
+            player_entered_house = false;
         }
 
         // virus hits the players (boolean variable is manipulated by Virus.cs)
