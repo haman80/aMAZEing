@@ -115,8 +115,8 @@ public class Level : MonoBehaviour
                     while (true) // try until virus placement is successful (unlikely that there will no places)
                     {
                         // try a random location in the grid
-                        int wr = Random.Range(1, width - 1);
-                        int lr = Random.Range(1, length - 1);
+                        int wr = Random.Range(2, width - 2);
+                        int lr = Random.Range(2, length - 2);
 
                         // if grid location is empty/free, place it there
                         if (grid[wr, lr] == null)
@@ -226,24 +226,25 @@ public class Level : MonoBehaviour
         return false;
     }
 
-    bool NoWallsCloseToVirus(List<TileType>[,] grid)
+    bool DruginCornerLike(List<TileType>[,] grid)
     {
         bool noWall = true;
-        for (int p = 0; p < pos_viruses.Count; p++) {
-            int w = pos_viruses[p][0];
-            int l =  pos_viruses[p][1];
-            if(grid[w, l][0] == TileType.VIRUS) {
+        int numWalls = 0;
+        for (int d = 0; d < pos_drugs.Count; d++) {
+            int w = pos_drugs[d][0];
+            int l =  pos_drugs[d][1];
+            if(grid[w, l][0] == TileType.DRUG) {
                 for(int i = -1; i <= 1; i++) {
                     for(int j = -1; j <= 1; j++) {
-                        if(i == 0 && j == 0 || (i == -1 && j == -1) || (i == 1 && j == 1) || (i == 1 && j == -1) || (i == -1 && j == 1))
+                        if(i == 0 && j == 0)
                             continue;
-                        if(w+i >= 0 && l+j >= 0 && w+i < width && l+j < length && grid[w, l].Count == 1 && grid[w+i,l+j][0] == TileType.WALL) {
-                            noWall = false;
-                        }
+                        if(w+i >= 0 && l+j >= 0 && w+i < width && l+j < length && grid[w, l].Count == 1 && grid[w+i,l+j][0] == TileType.WALL) { numWalls++; }
+                        if(numWalls >= 4) { noWall = false; }
                     }
                 }
                 if(noWall) { return true; }
                 noWall = true;
+                numWalls = 0;
             }
         }
         return false;
@@ -261,7 +262,7 @@ public class Level : MonoBehaviour
         grid[w, l] = new List<TileType> { t };
 
 		// note that we negate the functions here i.e., check if we are consistent with the constraints we want
-        bool areWeConsistent = !DoWeHaveTooManyInteriorWalls(grid) && !DoWeHaveTooFewWalls(grid) && !TooLongWall(grid) && !NoWallsCloseToVirus(grid);
+        bool areWeConsistent = !DoWeHaveTooManyInteriorWalls(grid) && !DoWeHaveTooFewWalls(grid) && !TooLongWall(grid) && !DruginCornerLike(grid);
 
         grid[w, l] = new List<TileType>();
         grid[w, l].AddRange(old_assignment);
