@@ -17,7 +17,7 @@ public class Level : MonoBehaviour
     public int width = 24;   // size of level (default 16 x 16 blocks)
     public int length = 24;
     public float storey_height = 2.5f;   // height of walls
-    public float virus_speed = 3.0f;     // virus velocity
+    public float virus_speed = 2.5f;     // virus velocity
     public GameObject fps_prefab;        // these should be set to prefabs as provided in the starter scene
     public GameObject virus_prefab;
     public GameObject house_prefab;
@@ -119,7 +119,7 @@ public class Level : MonoBehaviour
                         int lr = Random.Range(2, length - 2);
 
                         // if grid location is empty/free, place it there
-                        if (grid[wr, lr] == null)
+                        if (grid[wr, lr] == null && v == 0)
                         {
                             grid[wr, lr] = new List<TileType> { TileType.VIRUS };
                             pos_viruses.Add(new int[2] { wr, lr });
@@ -135,6 +135,29 @@ public class Level : MonoBehaviour
                                 }
                             }
                             break;
+                        }
+                        else {
+                            int dist = 0;
+                            for(int p = 0; p < v; p++) {
+                                dist += System.Math.Abs(wr - pos_viruses[p][0]) + System.Math.Abs(lr - pos_viruses[p][1]);
+                            }
+                            if (grid[wr, lr] == null && dist > 5*v)
+                            {
+                                grid[wr, lr] = new List<TileType> { TileType.VIRUS };
+                                pos_viruses.Add(new int[2] { wr, lr });
+                                while (true) {
+                                    int dwr = Random.Range(-1, 1);
+                                    int dlr = Random.Range(-1, 1);
+                                    if((dwr == -1 && dlr == -1) || (dwr == 1 && dlr == 1) || (dwr == 1 && dlr == -1) || (dwr == -1 && dlr == 1))
+                                        continue;
+                                    if(wr+dwr > 0 && wr+dwr < width-1 && lr + dlr > 0 && lr + dlr < length-1 && grid[wr + dwr, lr + dlr] == null) {
+                                        grid[wr + dwr, lr + dlr] = new List<TileType> { TileType.DRUG };
+                                        pos_drugs.Add(new int[2] { wr+dwr, lr+dlr });
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
                         }
                     }
                 }
@@ -172,7 +195,6 @@ public class Level : MonoBehaviour
         
     }
 
-    // one type of constraint already implemented for you
     bool DoWeHaveTooManyInteriorWalls(List<TileType>[,] grid)
     {
         int[] number_of_assigned_elements = new int[] { 0, 0, 0, 0 };
@@ -191,7 +213,6 @@ public class Level : MonoBehaviour
             return false;
     }
 
-    // another type of constraint already implemented for you
     bool DoWeHaveTooFewWalls(List<TileType>[,] grid)
     {
         int[] number_of_potential_assignments = new int[] { 0, 0, 0, 0 };
@@ -210,21 +231,21 @@ public class Level : MonoBehaviour
             return false;
     }
 
-    bool TooLongWall(List<TileType>[,] grid)
-    {
-        // for(int w = 0; w < width; w++) {
-        //     for(int l = 0; l < length; l++) {
-        //         if(grid[w, l].Count == 1 && grid[w, l][0] == TileType.WALL) {
-        //             if (w == 0 || l == 0 || w == width - 1 || l == length - 1)
-        //                 continue;
-        //             if((w+1 < width-1 && w-1 > 0 && grid[w+1, l][0] == TileType.WALL && grid[w-1, l][0] == TileType.WALL) || (l+1 < length-1 && l-1 > 0 && grid[w, l+1][0] == TileType.WALL && grid[w, l-1][0] == TileType.WALL)) {
-        //                 return true;
-        //             }
-        //         }
-        //     }
-        // }
-        return false;
-    }
+    // bool TooLongWall(List<TileType>[,] grid)
+    // {
+    //     for(int w = 0; w < width; w++) {
+    //         for(int l = 0; l < length; l++) {
+    //             if(grid[w, l].Count == 1 && grid[w, l][0] == TileType.WALL) {
+    //                 if (w == 0 || l == 0 || w == width - 1 || l == length - 1)
+    //                     continue;
+    //                 if((w+1 < width-1 && w-1 > 0 && grid[w+1, l][0] == TileType.WALL && grid[w-1, l][0] == TileType.WALL) || (l+1 < length-1 && l-1 > 0 && grid[w, l+1][0] == TileType.WALL && grid[w, l-1][0] == TileType.WALL)) {
+    //                     return true;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     return false;
+    // }
 
     bool DruginCornerLike(List<TileType>[,] grid)
     {
@@ -262,7 +283,7 @@ public class Level : MonoBehaviour
         grid[w, l] = new List<TileType> { t };
 
 		// note that we negate the functions here i.e., check if we are consistent with the constraints we want
-        bool areWeConsistent = !DoWeHaveTooManyInteriorWalls(grid) && !DoWeHaveTooFewWalls(grid) && !TooLongWall(grid) && !DruginCornerLike(grid);
+        bool areWeConsistent = !DoWeHaveTooManyInteriorWalls(grid) && !DoWeHaveTooFewWalls(grid) && !DruginCornerLike(grid);
 
         grid[w, l] = new List<TileType>();
         grid[w, l].AddRange(old_assignment);
@@ -576,7 +597,7 @@ public class Level : MonoBehaviour
         // drug picked by the player  (boolean variable is manipulated by Drug.cs)
         if (drug_landed_on_player_recently)
         {
-            player_health += Random.Range(0.25f, 0.75f);
+            player_health += Random.Range(0.25f, 0.4f);
             player_health = Mathf.Min(player_health, 1.0f);
             num_drugs_collected++;
             drug_landed_on_player_recently = false;

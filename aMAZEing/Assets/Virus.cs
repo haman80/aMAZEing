@@ -24,7 +24,7 @@ public class Virus : MonoBehaviour
         }
         fps_player_obj = level.fps_player_obj;
         Bounds bounds = level.GetComponent<Collider>().bounds;
-        radius_of_search_for_player = (bounds.size.x + bounds.size.z) / 10.0f;
+        radius_of_search_for_player = (bounds.size.x + bounds.size.z) / 15.0f;
         virus_speed = level.virus_speed;
         src = level.source;
     }
