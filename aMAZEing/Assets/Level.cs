@@ -21,6 +21,7 @@ public class Level : MonoBehaviour
     public GameObject fps_prefab;        // these should be set to prefabs as provided in the starter scene
     public GameObject virus_prefab;
     public GameObject house_prefab;
+    public Material wallColor;
     public GameObject text_box;
     public GameObject scroll_bar;
     public Camera cam;
@@ -138,10 +139,17 @@ public class Level : MonoBehaviour
                         }
                         else {
                             int dist = 0;
+                            bool tooClose = false;
                             for(int p = 0; p < v; p++) {
-                                dist += System.Math.Abs(wr - pos_viruses[p][0]) + System.Math.Abs(lr - pos_viruses[p][1]);
+                                if(System.Math.Abs(wr - pos_viruses[p][0]) + System.Math.Abs(lr - pos_viruses[p][1]) > 5) {
+                                    continue;
+                                }
+                                else {
+                                    tooClose = true;
+                                    break;
+                                }
                             }
-                            if (grid[wr, lr] == null && dist > 5*v)
+                            if (grid[wr, lr] == null && !tooClose)
                             {
                                 grid[wr, lr] = new List<TileType> { TileType.VIRUS };
                                 pos_viruses.Add(new int[2] { wr, lr });
@@ -502,13 +510,13 @@ public class Level : MonoBehaviour
                     house.name = "HOUSE";
                     house.transform.position = new Vector3(x + 0.5f, y, z + 0.5f);
                     if (l == 0)
-                        house.transform.Rotate(0.0f, 270.0f, 0.0f);
-                    else if (w == 0)
                         house.transform.Rotate(0.0f, 0.0f, 0.0f);
-                    else if (l == length - 1)
+                    else if (w == 0)
                         house.transform.Rotate(0.0f, 90.0f, 0.0f);
-                    else if (w == width - 1)
+                    else if (l == length - 1)
                         house.transform.Rotate(0.0f, 180.0f, 0.0f);
+                    else if (w == width - 1)
+                        house.transform.Rotate(0.0f, 270.0f, 0.0f);
 
                     house.AddComponent<BoxCollider>();
                     house.GetComponent<BoxCollider>().isTrigger = true;
@@ -520,9 +528,9 @@ public class Level : MonoBehaviour
                 {
                     GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     cube.name = "WALL";
-                    cube.transform.localScale = new Vector3(bounds.size[0] / (float)width, storey_height, bounds.size[2] / (float)length);
+                    cube.transform.localScale = new Vector3(bounds.size[0] / (float)width, storey_height*2, bounds.size[2] / (float)length);
                     cube.transform.position = new Vector3(x + 0.5f, y + storey_height / 2.0f, z + 0.5f);
-                    cube.GetComponent<Renderer>().material.color = new Color(0.6f, 0.8f, 0.8f);
+                    cube.GetComponent<Renderer>().material = wallColor;
                     obj.Add(cube);
                 }
                 else if (solution[w, l][0] == TileType.VIRUS)
@@ -583,6 +591,11 @@ public class Level : MonoBehaviour
         else if (player_entered_house && num_drugs_collected != num_drugs) {
             text_box.GetComponent<Text>().text = "Didn't collect every drug!";
             player_entered_house = false;
+        }
+
+        if(fps_player_obj.transform.position.y < -10) {
+            Object.Destroy(fps_player_obj);
+            TryAgain();
         }
 
         // virus hits the players (boolean variable is manipulated by Virus.cs)

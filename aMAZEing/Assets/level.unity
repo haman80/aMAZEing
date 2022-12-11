@@ -1647,7 +1647,9 @@ MonoBehaviour:
   fps_prefab: {fileID: 100006, guid: c6453f8e1f814744d8b94e5a6d1f9942, type: 3}
   virus_prefab: {fileID: 1752992853893934, guid: b24a09259ec34a44186fdcb616993efe,
     type: 3}
-  house_prefab: {fileID: 100006, guid: bff9f12c2b78a19499683923993e62cc, type: 3}
+  house_prefab: {fileID: 1354419093465426, guid: fb6e45a6010fdae4b91b4ccbac21425e,
+    type: 3}
+  wallColor: {fileID: 2100000, guid: 333a08b54ec5eec4f84f74d910ad751e, type: 2}
   text_box: {fileID: 1231343217}
   scroll_bar: {fileID: 756415155}
   cam: {fileID: 2128653567}
