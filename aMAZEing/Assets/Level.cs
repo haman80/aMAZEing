@@ -118,6 +118,7 @@ public class Level : MonoBehaviour
                         // try a random location in the grid
                         int wr = Random.Range(2, width - 2);
                         int lr = Random.Range(2, length - 2);
+                        bool tooClose = false;
 
                         // if grid location is empty/free, place it there
                         if (grid[wr, lr] == null && v == 0)
@@ -138,18 +139,13 @@ public class Level : MonoBehaviour
                             break;
                         }
                         else {
-                            int dist = 0;
-                            bool tooClose = false;
                             for(int p = 0; p < v; p++) {
-                                if(System.Math.Abs(wr - pos_viruses[p][0]) + System.Math.Abs(lr - pos_viruses[p][1]) > 5) {
-                                    continue;
-                                }
-                                else {
+                                if((System.Math.Abs(wr - pos_viruses[p][0]) + System.Math.Abs(lr - pos_viruses[p][1])) < 5) {
                                     tooClose = true;
                                     break;
                                 }
                             }
-                            if (grid[wr, lr] == null && !tooClose)
+                            if (!tooClose && grid[wr, lr] == null)
                             {
                                 grid[wr, lr] = new List<TileType> { TileType.VIRUS };
                                 pos_viruses.Add(new int[2] { wr, lr });
@@ -238,22 +234,6 @@ public class Level : MonoBehaviour
         else
             return false;
     }
-
-    // bool TooLongWall(List<TileType>[,] grid)
-    // {
-    //     for(int w = 0; w < width; w++) {
-    //         for(int l = 0; l < length; l++) {
-    //             if(grid[w, l].Count == 1 && grid[w, l][0] == TileType.WALL) {
-    //                 if (w == 0 || l == 0 || w == width - 1 || l == length - 1)
-    //                     continue;
-    //                 if((w+1 < width-1 && w-1 > 0 && grid[w+1, l][0] == TileType.WALL && grid[w-1, l][0] == TileType.WALL) || (l+1 < length-1 && l-1 > 0 && grid[w, l+1][0] == TileType.WALL && grid[w, l-1][0] == TileType.WALL)) {
-    //                     return true;
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return false;
-    // }
 
     bool DruginCornerLike(List<TileType>[,] grid)
     {
