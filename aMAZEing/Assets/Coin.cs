@@ -1,10 +1,8 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// functionality of drug
-// animates color, and triggers a variable if the player reaches the drug 
-public class Drug : MonoBehaviour
+public class Coin : MonoBehaviour
 {
     private GameObject fps_player_obj;
     private Level level;
@@ -23,12 +21,17 @@ public class Drug : MonoBehaviour
         src = level.source;
     }
 
+    // Update is called once per frame
+    void Update()
+    {
+        transform.Rotate(90 * Time.deltaTime, 0 , 0);
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.name == "PLAYER")
         {
-            level.drug_landed_on_player_recently = true;
-            src.PlayOneShot(level.drug);
+            level.num_tokens_collected += 1;
             Destroy(gameObject);
         }
     }
