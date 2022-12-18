@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657838, g: 0.49641234, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1726,9 +1726,12 @@ MonoBehaviour:
   width: 24
   length: 24
   storey_height: 2.5
-  virus_speed: 3
+  mutant_speed: 2
+  mutant_hit_player: 0
+  num_mutants: 5
+  num_tokens: 5
   fps_prefab: {fileID: 100006, guid: c6453f8e1f814744d8b94e5a6d1f9942, type: 3}
-  virus_prefab: {fileID: 1752992853893934, guid: b24a09259ec34a44186fdcb616993efe,
+  mutant_prefab: {fileID: 6813258842894415423, guid: c58b47733b6734f489c1fb0a0771065b,
     type: 3}
   house_prefab: {fileID: 1354419093465426, guid: fb6e45a6010fdae4b91b4ccbac21425e,
     type: 3}
