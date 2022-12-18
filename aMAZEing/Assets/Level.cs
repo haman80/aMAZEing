@@ -351,7 +351,7 @@ public class Level : MonoBehaviour
     // you will need to edit this function (see below)
     void DrawDungeon(List<TileType>[,] solution)
     {
-        GetComponent<Renderer>().material.color = Color.black; // ground plane will be grey
+        GetComponent<Renderer>().material.color = Color.grey; // ground plane will be grey
 
         // place character at random position (wr, lr) in terms of grid coordinates (integers)
         // make sure that this random position is a FLOOR tile (not wall, drug, or virus)
@@ -678,6 +678,10 @@ public class Level : MonoBehaviour
             Object.Destroy(fps_player_obj);
             TryAgain();
         }
+
+        // if(fps_player_obj.transform.position.y >= storey_height*1.5) {
+        //     fps_player_obj.transform.position = new Vector3(fps_player_obj.transform.position.x + .5f, storey_height,  fps_player_obj.transform.position.y+.5f);
+        // }
 
         if (mutant_hit_player){
             float damage = Random.Range(damage_multi*0.125f, damage_multi*0.25f);
