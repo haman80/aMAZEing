@@ -619,10 +619,10 @@ public class Level : MonoBehaviour
                 {
                     GameObject token = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
                     token.name = "COIN";
-                    token.transform.localScale = new Vector3(1f, .1f, 1f);
+                    token.transform.localScale = new Vector3(1f, .05f, 1f);
                     token.transform.position = new Vector3(x + 0.5f, y + storey_height / 2.0f, z + 0.5f);
                     token.GetComponent<Renderer>().material = coinColor;
-                    token.transform.Rotate(0, 0, 90);
+                    token.transform.Rotate(90, 0, 0);
                     token.AddComponent<Coin>();
                     obj.Add(token);
                 }

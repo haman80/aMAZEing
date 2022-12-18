@@ -24,7 +24,7 @@ public class Coin : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Rotate(90 * Time.deltaTime, 0 , 0);
+        transform.Rotate(0, 0, 90 * Time.deltaTime);
     }
 
     private void OnCollisionEnter(Collision collision)
