@@ -8,8 +8,20 @@ public class UI : MonoBehaviour
     public void Active() {
         gameObject.SetActive(true);
     }
+        
+    public void Menu() {
+        SceneManager.LoadScene("Menu");
+    }
     
-    public void Play() {
-        SceneManager.LoadScene("level");
+    public void Normal() {
+        SceneManager.LoadScene("Normal");
+    }
+
+    public void Easy() {
+        SceneManager.LoadScene("Easy");
+    }
+
+    public void Hard() {
+        SceneManager.LoadScene("Hard");
     }
 }
