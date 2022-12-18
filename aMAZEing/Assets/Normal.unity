@@ -3200,12 +3200,12 @@ MonoBehaviour:
   width: 24
   length: 24
   storey_height: 2.5
-  virus_speed: 3
-  num_viruses: 5
+  mutant_speed: 2.5
+  num_mutants: 5
   num_tokens: 5
   damage_multi: 2
   fps_prefab: {fileID: 100006, guid: c6453f8e1f814744d8b94e5a6d1f9942, type: 3}
-  virus_prefab: {fileID: 1752992853893934, guid: b24a09259ec34a44186fdcb616993efe,
+  mutant_prefab: {fileID: 6813258842894415423, guid: c58b47733b6734f489c1fb0a0771065b,
     type: 3}
   house_prefab: {fileID: 1354419093465426, guid: fb6e45a6010fdae4b91b4ccbac21425e,
     type: 3}
@@ -3224,6 +3224,7 @@ MonoBehaviour:
   drug: {fileID: 8300000, guid: 84526fd995a20401fa0c0fccf653c5e2, type: 3}
   PlayAgain: {fileID: 98047947}
   tryAgain: {fileID: 1353457072}
+  mutant_hit_player: 0
 --- !u!23 &1919539188
 MeshRenderer:
   m_ObjectHideFlags: 0

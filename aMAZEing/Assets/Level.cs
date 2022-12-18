@@ -8,7 +8,7 @@ enum TileType
     WALL = 0,
     FLOOR = 1,
     DRUG = 2,
-    VIRUS = 3,
+    MUTANT = 3,
     COIN = 4
 }
 
@@ -18,20 +18,12 @@ public class Level : MonoBehaviour
     public int width = 24;   // size of level (default 16 x 16 blocks)
     public int length = 24;
     public float storey_height = 2.5f;   // height of walls
-<<<<<<< HEAD
-    public float mutant_speed = 2.5f;
-    public bool mutant_hit_player = false;
+    public float mutant_speed = 2.5f;     // virus velocity
     public int num_mutants = 5; 
     public int num_tokens = 5;  
     public int damage_multi = 0;
-
-=======
-    public float virus_speed = 2.5f;     // virus velocity
-    public int num_viruses = 5; 
-    public int num_tokens = 5;   
->>>>>>> parent of 183e81e (Added AI)
     public GameObject fps_prefab;        // these should be set to prefabs as provided in the starter scene
-    public GameObject virus_prefab;
+    public GameObject mutant_prefab;
     public GameObject house_prefab;
     public GameObject drug_prefab;
     public Material wallColor;
@@ -47,11 +39,11 @@ public class Level : MonoBehaviour
     public AudioClip drug;
     public UI PlayAgain;
     public GameObject tryAgain;
+    public bool mutant_hit_player;
 
     // fields/variables accessible from other scripts
     internal GameObject fps_player_obj;   // instance of FPS template
     internal float player_health = 1.0f;  // player health in range [0.0, 1.0]
-    internal bool virus_landed_on_player_recently = false;  // has virus hit the player? if yes, a timer of 5sec starts before infection
     internal bool drug_landed_on_player_recently = false;   // has drug collided with player?
     internal bool player_entered_house = false;             // has player arrived in house?
     internal int num_tokens_collected = 0; 
@@ -59,7 +51,7 @@ public class Level : MonoBehaviour
     // fields/variables needed only from this script
     private Bounds bounds;                   // size of ground plane in world space coordinates 
     private int function_calls = 0;          // number of function calls during backtracking for solving the CSP
-    private List<int[]> pos_viruses;         // stores their location in the grid           
+    private List<int[]> pos_mutants;         // stores their location in the grid           
     private List<int[]> pos_tokens;
     private  List<int[]> pos_drugs;     
     private int[,] dist;
@@ -100,7 +92,6 @@ public class Level : MonoBehaviour
         bounds = GetComponent<Collider>().bounds; 
         function_calls = 0;
         player_health = 1.0f;
-        virus_landed_on_player_recently = false;
         drug_landed_on_player_recently = false;
         player_entered_house = false;  
         num_tokens_collected = 0;   
@@ -116,19 +107,15 @@ public class Level : MonoBehaviour
             // useful to keep variables that are unassigned so far
             List<int[]> unassigned = new List<int[]>();
      
-            pos_viruses = new List<int[]>();
+            pos_mutants = new List<int[]>();
             pos_tokens = new List<int[]>();
             pos_drugs = new List<int[]>(); 
 
             bool success = false;        
             while (!success)
             {
-<<<<<<< HEAD
 
                 for (int t = 0; t < num_tokens; t++)
-=======
-                for (int v = 0; v < num_viruses; v++)
->>>>>>> parent of 183e81e (Added AI)
                 {
                     while (true) 
                     {
@@ -136,52 +123,9 @@ public class Level : MonoBehaviour
                         int lr = Random.Range(1, length - 1);
                         bool tooClose = false;
 
-<<<<<<< HEAD
                         for(int p = 0; p < t; p++) {
                             if((System.Math.Abs(wr - pos_tokens[p][0]) + System.Math.Abs(lr - pos_tokens[p][1])) < 5) {
                                 tooClose = true;
-=======
-                        // if grid location is empty/free, place it there
-                        if (grid[wr, lr] == null && v == 0)
-                        {
-                            grid[wr, lr] = new List<TileType> { TileType.VIRUS };
-                            pos_viruses.Add(new int[2] { wr, lr });
-                            while (true) {
-                                int twr = Random.Range(-1, 1);
-                                int tlr = Random.Range(-1, 1);
-                                if((twr == -1 && tlr == -1) || (twr == 1 && tlr == 1) || (twr == 1 && tlr == -1) || (twr == -1 && tlr == 1))
-                                    continue;
-                                if(wr+twr > 0 && wr+twr < width-1 && lr + tlr > 0 && lr + tlr < length-1 && grid[wr + twr, lr + tlr] == null) {
-                                    grid[wr + twr, lr + tlr] = new List<TileType> { TileType.COIN };
-                                    pos_tokens.Add(new int[2] { wr+twr, lr+tlr });
-                                    break;
-                                }
-                            }
-                            break;
-                        }
-                        else {
-                            for(int p = 0; p < v; p++) {
-                                if((System.Math.Abs(wr - pos_viruses[p][0]) + System.Math.Abs(lr - pos_viruses[p][1])) < 5) {
-                                    tooClose = true;
-                                    break;
-                                }
-                            }
-                            if (tooClose == false && grid[wr, lr] == null)
-                            {
-                                grid[wr, lr] = new List<TileType> { TileType.VIRUS };
-                                pos_viruses.Add(new int[2] { wr, lr });
-                                while (true) {
-                                    int twr = Random.Range(-1, 1);
-                                    int tlr = Random.Range(-1, 1);
-                                    if((twr == -1 && tlr == -1) || (twr == 1 && tlr == 1) || (twr == 1 && tlr == -1) || (twr == -1 && tlr == 1))
-                                        continue;
-                                    if(wr+twr > 0 && wr+twr < width-1 && lr + tlr > 0 && lr + tlr < length-1 && grid[wr + twr, lr + tlr] == null) {
-                                        grid[wr + twr, lr + tlr] = new List<TileType> { TileType.COIN };
-                                        pos_tokens.Add(new int[2] { wr+twr, lr+tlr });
-                                        break;
-                                    }
-                                }
->>>>>>> parent of 183e81e (Added AI)
                                 break;
                             }
                         }
@@ -195,7 +139,7 @@ public class Level : MonoBehaviour
                     }
                 }
 
-                for (int v = 0; v < num_viruses; v++)
+                for (int v = 0; v < num_mutants; v++)
                 {
                     while (true)
                     {
@@ -204,7 +148,7 @@ public class Level : MonoBehaviour
                         bool tooClose = false;
 
                         for(int p = 0; p < v; p++) {
-                            if((System.Math.Abs(wr - pos_viruses[p][0]) + System.Math.Abs(lr - pos_viruses[p][1])) < 5) {
+                            if((System.Math.Abs(wr - pos_mutants[p][0]) + System.Math.Abs(lr - pos_mutants[p][1])) < 5) {
                                 tooClose = true;
                                 break;
                             }
@@ -212,8 +156,8 @@ public class Level : MonoBehaviour
 
                         if (!tooClose && grid[wr, lr] == null)
                         {
-                            grid[wr, lr] = new List<TileType> { TileType.VIRUS };
-                            pos_viruses.Add(new int[2] { wr, lr });
+                            grid[wr, lr] = new List<TileType> { TileType.MUTANT };
+                            pos_mutants.Add(new int[2] { wr, lr });
                             break;
                         }
                     }
@@ -280,7 +224,7 @@ public class Level : MonoBehaviour
                     number_of_assigned_elements[(int)grid[w, l][0]]++;
             }
 
-        if (number_of_assigned_elements[(int)TileType.WALL] > num_viruses * 10)
+        if (number_of_assigned_elements[(int)TileType.WALL] > num_mutants * 10)
             return true;
         else
             return false;
@@ -595,14 +539,14 @@ public class Level : MonoBehaviour
                     cube.GetComponent<Renderer>().material = wallColor;
                     obj.Add(cube);
                 }
-                else if (solution[w, l][0] == TileType.VIRUS)
+                else if (solution[w, l][0] == TileType.MUTANT)
                 {
-                    GameObject virus = Instantiate(virus_prefab, new Vector3(0, 0, 0), Quaternion.identity);
-                    virus.name = "COVID";
-                    virus.transform.position = new Vector3(x + 0.5f, y + Random.Range(1.0f, storey_height / 2.0f), z + 0.5f);
-                    virus.AddComponent<Virus>();
-                    virus.GetComponent<Rigidbody>().mass = 10000;
-                    obj.Add(virus);
+                    GameObject mutant = Instantiate(mutant_prefab, new Vector3(0, 0, 0), Quaternion.identity);
+                    mutant.name = "MUTANT";
+                    mutant.transform.position = new Vector3(x + 0.5f,0.0f, z + 0.5f);
+                    mutant.AddComponent<Mutant>();
+                    mutant.GetComponent<Rigidbody>().mass = 10000;
+                    obj.Add(mutant);
                 }
                 else if (solution[w, l][0] == TileType.DRUG)
                 {
@@ -675,13 +619,10 @@ public class Level : MonoBehaviour
             TryAgain();
         }
 
-        // virus hits the players (boolean variable is manipulated by Virus.cs)
-        if (virus_landed_on_player_recently)
-        {
-            player_health -= Random.Range(0.25f, 0.5f);
-            source.PlayOneShot(health);
+        if (mutant_hit_player){
+            player_health -= Random.Range(damage_multi*0.125f, damage_multi*0.25f);
             player_health = Mathf.Max(player_health, 0.0f);
-            virus_landed_on_player_recently = false;
+            mutant_hit_player = false;
         }
 
         // drug picked by the player  (boolean variable is manipulated by Drug.cs)
@@ -690,7 +631,6 @@ public class Level : MonoBehaviour
             player_health += Random.Range(0.25f, 0.4f);
             player_health = Mathf.Min(player_health, 1.0f);
             drug_landed_on_player_recently = false;
-            virus_landed_on_player_recently = false;
         }
 
         // update scroll bar (not a very conventional manner to create a health bar, but whatever)
