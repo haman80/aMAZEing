@@ -34,7 +34,7 @@ public class Level : MonoBehaviour
     public AudioSource source;
     public AudioClip exit;
     public AudioClip infected;
-    public AudioClip health;
+    public AudioClip coin;
     public AudioClip drug;
     public UI PlayAgain;
     public GameObject tryAgain;
@@ -49,7 +49,6 @@ public class Level : MonoBehaviour
 
     // fields/variables needed only from this script
     private Bounds bounds;                   // size of ground plane in world space coordinates 
-    private float timestamp_last_msg = 0.0f; // timestamp used to record when last message on GUI happened (after 7 sec, default msg appears)
     private int function_calls = 0;          // number of function calls during backtracking for solving the CSP
     private List<int[]> pos_viruses;         // stores their location in the grid           
     private List<int[]> pos_tokens;
@@ -82,6 +81,7 @@ public class Level : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        Time.timeScale = 1f;
         List<TileType>[,] grid = null;
         CreateGame(grid);
     }
@@ -89,7 +89,6 @@ public class Level : MonoBehaviour
     private void CreateGame(List<TileType>[,] grid) {
         // initialize internal/private variables
         bounds = GetComponent<Collider>().bounds; 
-        timestamp_last_msg = 0.0f;
         function_calls = 0;
         player_health = 1.0f;
         virus_landed_on_player_recently = false;
@@ -144,7 +143,7 @@ public class Level : MonoBehaviour
                         }
                         else {
                             for(int p = 0; p < v; p++) {
-                                if((System.Math.Abs(wr - pos_viruses[p][0]) + System.Math.Abs(lr - pos_viruses[p][1])) < 5) {
+                                if((System.Math.Abs(wr - pos_viruses[p][0]) + System.Math.Abs(lr - pos_viruses[p][1])) < 3) {
                                     tooClose = true;
                                     break;
                                 }
@@ -581,6 +580,10 @@ public class Level : MonoBehaviour
     void Update()
     {
         text_tokens.text = num_tokens_collected + " / " + num_tokens + " Tokens Retrieved";
+        if(num_tokens == num_tokens_collected) {
+            text_box.GetComponent<Text>().text = "Reach the Castle!";
+        }
+
         if (player_health < 0.001f) // the player dies here
         {
             text_box.GetComponent<Text>().text = "Failed!";
@@ -612,7 +615,7 @@ public class Level : MonoBehaviour
             return;
         }
         else if (player_entered_house && num_tokens_collected != num_tokens) {
-            text_box.GetComponent<Text>().text = "Didn't collect every token!";
+            text_box.GetComponent<Text>().text = "Collect " + (num_tokens - num_tokens_collected) + " more token!";
             player_entered_house = false;
         }
 
@@ -625,7 +628,6 @@ public class Level : MonoBehaviour
         if (virus_landed_on_player_recently)
         {
             player_health -= Random.Range(0.25f, 0.5f);
-            source.PlayOneShot(health);
             player_health = Mathf.Max(player_health, 0.0f);
             virus_landed_on_player_recently = false;
         }

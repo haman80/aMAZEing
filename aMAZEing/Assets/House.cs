@@ -29,7 +29,8 @@ public class House : MonoBehaviour
         if (other.gameObject.name == "PLAYER")
         {
             level.player_entered_house = true;
-            src.PlayOneShot(level.exit);
+            if(level.num_tokens == level.num_tokens_collected)
+                src.PlayOneShot(level.exit);
         }
     }
 }

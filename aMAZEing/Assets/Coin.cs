@@ -32,6 +32,7 @@ public class Coin : MonoBehaviour
         if (collision.gameObject.name == "PLAYER")
         {
             level.num_tokens_collected += 1;
+            src.PlayOneShot(level.coin);
             Destroy(gameObject);
         }
     }
