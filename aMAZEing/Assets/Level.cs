@@ -8,8 +8,9 @@ enum TileType
     WALL = 0,
     FLOOR = 1,
     DRUG = 2,
-    MUTANT = 3,
-    COIN = 4
+    SHIELD = 3,
+    MUTANT = 4,
+    COIN = 5
 }
 
 public class Level : MonoBehaviour
@@ -26,27 +27,31 @@ public class Level : MonoBehaviour
     public GameObject mutant_prefab;
     public GameObject house_prefab;
     public GameObject drug_prefab;
+    public GameObject shield_prefab;
     public Material wallColor;
     public Material coinColor;
     public GameObject text_box;
     public Text text_tokens;
     public GameObject scroll_bar;
+    public GameObject shield_bar;
     public Camera cam;
     public AudioSource source;
     public AudioClip exit;
     public AudioClip infected;
     public AudioClip coin;
     public AudioClip drug;
+    public AudioClip shielded;
     public UI PlayAgain;
     public GameObject tryAgain;
-    public bool mutant_hit_player;
 
     // fields/variables accessible from other scripts
     internal GameObject fps_player_obj;   // instance of FPS template
     internal float player_health = 1.0f;  // player health in range [0.0, 1.0]
     internal bool drug_landed_on_player_recently = false;   // has drug collided with player?
+    internal bool shield_landed_on_player_recently = false;
     internal bool player_entered_house = false;             // has player arrived in house?
     internal int num_tokens_collected = 0; 
+    internal bool mutant_hit_player = false;
 
     // fields/variables needed only from this script
     private Bounds bounds;                   // size of ground plane in world space coordinates 
@@ -54,9 +59,11 @@ public class Level : MonoBehaviour
     private List<int[]> pos_mutants;         // stores their location in the grid           
     private List<int[]> pos_tokens;
     private  List<int[]> pos_drugs;     
+    private  List<int[]> pos_shields; 
     private int[,] dist;
     private List<GameObject> obj;
     private List<TileType>[,] gridSol = null;
+    private float shield_health = 0.0f;
     private int wee_again = -1;
     private int lee_again = -1;
     private int wr_again = -1;
@@ -92,6 +99,7 @@ public class Level : MonoBehaviour
         bounds = GetComponent<Collider>().bounds; 
         function_calls = 0;
         player_health = 1.0f;
+        shield_health = 0.0f;
         drug_landed_on_player_recently = false;
         player_entered_house = false;  
         num_tokens_collected = 0;   
@@ -110,6 +118,7 @@ public class Level : MonoBehaviour
             pos_mutants = new List<int[]>();
             pos_tokens = new List<int[]>();
             pos_drugs = new List<int[]>(); 
+            pos_shields = new List<int[]>(); 
 
             bool success = false;        
             while (!success)
@@ -179,6 +188,22 @@ public class Level : MonoBehaviour
                     }
                 }
 
+                for (int s = 0; s < 4; s++)
+                {
+                    while (true)
+                    {
+                        int wr = Random.Range(1, width - 1);
+                        int lr = Random.Range(1, length - 1);
+
+                        if (grid[wr, lr] == null)
+                        {
+                            grid[wr, lr] = new List<TileType> { TileType.SHIELD };
+                            pos_shields.Add(new int[2] { wr, lr });
+                            break;
+                        }
+                    }
+                }
+
                 for (int w = 0; w < width; w++)
                     for (int l = 0; l < length; l++)
                         if (w == 0 || l == 0 || w == width - 1 || l == length - 1)
@@ -214,7 +239,7 @@ public class Level : MonoBehaviour
 
     bool TooManyInteriorWalls(List<TileType>[,] grid)
     {
-        int[] number_of_assigned_elements = new int[] { 0, 0, 0, 0, 0 };
+        int[] number_of_assigned_elements = new int[] { 0, 0, 0, 0, 0, 0 };
         for (int w = 0; w < width; w++)
             for (int l = 0; l < length; l++)
             {
@@ -232,7 +257,7 @@ public class Level : MonoBehaviour
 
     bool TooFewWalls(List<TileType>[,] grid)
     {
-        int[] number_of_potential_assignments = new int[] { 0, 0, 0, 0, 0 };
+        int[] number_of_potential_assignments = new int[] { 0, 0, 0, 0, 0, 0 };
         for (int w = 0; w < width; w++)
             for (int l = 0; l < length; l++)
             {
@@ -497,6 +522,19 @@ public class Level : MonoBehaviour
             }
         }
 
+        for(int i = 0; i < pos_shields.Count; i++) {
+            minWallPath = dist[pos_shields[i][0], pos_shields[i][1]];
+            prevNode = prev[pos_shields[i][0], pos_shields[i][1]];
+            while(minWallPath != 0) {
+                if(solution[prevNode[0][0], prevNode[0][1]][0] == TileType.WALL) {
+                    solution[prevNode[0][0], prevNode[0][1]] = new List<TileType> { TileType.FLOOR };
+                    minWallPath--;
+                }
+                if(prevNode[0][0] == wr && prevNode[0][1] == lr) break;
+                prevNode = prev[prevNode[0][0], prevNode[0][1]];
+            }
+        }
+
         // the rest of the code creates the scenery based on the grid state 
         // you don't need to modify this code (unless you want to replace the virus
         // or other prefabs with something else you like)
@@ -550,11 +588,19 @@ public class Level : MonoBehaviour
                 }
                 else if (solution[w, l][0] == TileType.DRUG)
                 {
-                    GameObject capsule = Instantiate(drug_prefab, new Vector3(0, 0, 0), Quaternion.identity);
-                    capsule.name = "DRUG";
-                    capsule.transform.position = new Vector3(x + 0.5f, y , z + 0.5f);
-                    capsule.AddComponent<Drug>();
-                    obj.Add(capsule);
+                    GameObject potion = Instantiate(drug_prefab, new Vector3(0, 0, 0), Quaternion.identity);
+                    potion.name = "HEALTH";
+                    potion.transform.position = new Vector3(x + 0.5f, y, z + 0.5f);
+                    potion.AddComponent<Drug>();
+                    obj.Add(potion);
+                }
+                else if (solution[w, l][0] == TileType.SHIELD)
+                {
+                    GameObject shield = Instantiate(shield_prefab, new Vector3(0, 0, 0), Quaternion.identity);
+                    shield.name = "SHIELD";
+                    shield.transform.position = new Vector3(x + 0.5f, y, z + 0.5f);
+                    shield.AddComponent<Shield>();
+                    obj.Add(shield);
                 }
                 else if (solution[w, l][0] == TileType.COIN)
                 {
@@ -620,12 +666,19 @@ public class Level : MonoBehaviour
         }
 
         if (mutant_hit_player){
-            player_health -= Random.Range(damage_multi*0.125f, damage_multi*0.25f);
+            float damage = Random.Range(damage_multi*0.125f, damage_multi*0.25f);
+            if(shield_health > .001f) {
+                float temp = shield_health;
+                shield_health -= damage;
+                damage -= temp;
+                if(damage < 0.0f) { damage = 0.0f; }
+            }
+            player_health -= damage;
             player_health = Mathf.Max(player_health, 0.0f);
+            shield_health = Mathf.Max(shield_health, 0.0f);
             mutant_hit_player = false;
         }
 
-        // drug picked by the player  (boolean variable is manipulated by Drug.cs)
         if (drug_landed_on_player_recently)
         {
             player_health += Random.Range(0.25f, 0.4f);
@@ -633,8 +686,21 @@ public class Level : MonoBehaviour
             drug_landed_on_player_recently = false;
         }
 
+        if (shield_landed_on_player_recently)
+        {
+            shield_health += Random.Range(0.1f, 0.35f);
+            shield_health = Mathf.Min(shield_health, 1.0f);
+            shield_landed_on_player_recently = false;
+        }
+
         // update scroll bar (not a very conventional manner to create a health bar, but whatever)
         scroll_bar.GetComponent<Scrollbar>().size = player_health;
+        shield_bar.GetComponent<Scrollbar>().size = shield_health;
+        if(shield_health > .001f) {
+            ColorBlock cb = shield_bar.GetComponent<Scrollbar>().colors;
+            cb.disabledColor = new Color(0.2f, .5f, 1f);
+            shield_bar.GetComponent<Scrollbar>().colors = cb;
+        }
         if (player_health < 0.5f)
         {
             ColorBlock cb = scroll_bar.GetComponent<Scrollbar>().colors;
@@ -644,7 +710,7 @@ public class Level : MonoBehaviour
         else
         {
             ColorBlock cb = scroll_bar.GetComponent<Scrollbar>().colors;
-            cb.disabledColor = new Color(0.0f, 1.0f, 0.25f);
+            cb.disabledColor = new Color(0.0f, 1.0f, 0.20f);
             scroll_bar.GetComponent<Scrollbar>().colors = cb;
         }
     }

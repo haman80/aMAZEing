@@ -48,18 +48,18 @@ public class Mutant : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (level.player_health < 0.001f || level.player_entered_house && level.num_tokens == level.num_tokens_collected)
+            return;
         Vector3 correction = new Vector3(0.0f, 0.0f, 0.0f);
         Ray ray1 = new Ray(transform.position+0.5f*Vector3.Cross(transform.forward, Vector3.up).normalized, transform.forward);
         Ray ray2 = new Ray(transform.position-0.5f*Vector3.Cross(transform.forward, Vector3.up).normalized, transform.forward);
         if (Physics.Raycast(ray1, out hit,1.0f)){
                 if (hit.transform.gameObject.name=="WALL"){
-                    Debug.Log("Hello");
                     correction= hit.normal;
                 }
         }
         if (Physics.Raycast(ray2, out hit,1.0f)){
                 if (hit.transform.gameObject.name=="WALL"){
-                    Debug.Log("Hello");
                     correction= hit.normal;
                 }
         }
@@ -68,7 +68,7 @@ public class Mutant : MonoBehaviour
             hit_time = Time.time;
             flag = false;
         }
-        if (!flag && Time.time-hit_time>0.6f){
+        if (!flag && Time.time-hit_time>0.3f){
             Destroy(gameObject);
         }
         // if (!isCurrentlyColliding){
