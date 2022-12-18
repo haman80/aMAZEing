@@ -69,6 +69,11 @@ public class phraseHandler : MonoBehaviour
     void Update()
     {   
         if(level.num_tokens_collected == 0) {
+            tokenIndex = 0;
+            for(int i = 0; i < wordVisability.Length; i++) {
+                wordVisability[i]=false;
+            }
+            revealIndex = 0;
             fact_on_canvas.text = savedText;
         }
         if(tokenIndex < level.num_tokens_collected) {

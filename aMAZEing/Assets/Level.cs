@@ -351,7 +351,7 @@ public class Level : MonoBehaviour
     // you will need to edit this function (see below)
     void DrawDungeon(List<TileType>[,] solution)
     {
-        GetComponent<Renderer>().material.color = Color.grey; // ground plane will be grey
+        GetComponent<Renderer>().material.color = Color.black; // ground plane will be grey
 
         // place character at random position (wr, lr) in terms of grid coordinates (integers)
         // make sure that this random position is a FLOOR tile (not wall, drug, or virus)
