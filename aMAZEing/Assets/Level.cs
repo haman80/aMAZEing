@@ -20,7 +20,8 @@ public class Level : MonoBehaviour
     public float storey_height = 2.5f;   // height of walls
     public float virus_speed = 2.5f;     // virus velocity
     public int num_viruses = 5; 
-    public int num_tokens = 5;   
+    public int num_tokens = 5;  
+    public int damage_multi = 0;
     public GameObject fps_prefab;        // these should be set to prefabs as provided in the starter scene
     public GameObject virus_prefab;
     public GameObject house_prefab;
@@ -114,57 +115,51 @@ public class Level : MonoBehaviour
             bool success = false;        
             while (!success)
             {
-                for (int v = 0; v < num_viruses; v++)
+
+                for (int t = 0; t < num_tokens; t++)
                 {
-                    while (true) // try until virus placement is successful (unlikely that there will no places)
+                    while (true) 
                     {
-                        // try a random location in the grid
                         int wr = Random.Range(1, width - 1);
                         int lr = Random.Range(1, length - 1);
                         bool tooClose = false;
 
-                        // if grid location is empty/free, place it there
-                        if (grid[wr, lr] == null && v == 0)
+                        for(int p = 0; p < t; p++) {
+                            if((System.Math.Abs(wr - pos_tokens[p][0]) + System.Math.Abs(lr - pos_tokens[p][1])) < 5) {
+                                tooClose = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!tooClose && grid[wr, lr] == null)
+                        {
+                            grid[wr, lr] = new List<TileType> { TileType.COIN };
+                            pos_tokens.Add(new int[2] { wr, lr });
+                            break;
+                        }
+                    }
+                }
+
+                for (int v = 0; v < num_viruses; v++)
+                {
+                    while (true)
+                    {
+                        int wr = Random.Range(1, width - 1);
+                        int lr = Random.Range(1, length - 1);
+                        bool tooClose = false;
+
+                        for(int p = 0; p < v; p++) {
+                            if((System.Math.Abs(wr - pos_viruses[p][0]) + System.Math.Abs(lr - pos_viruses[p][1])) < 5) {
+                                tooClose = true;
+                                break;
+                            }
+                        }
+
+                        if (!tooClose && grid[wr, lr] == null)
                         {
                             grid[wr, lr] = new List<TileType> { TileType.VIRUS };
                             pos_viruses.Add(new int[2] { wr, lr });
-                            while (true) {
-                                int twr = Random.Range(-1, 1);
-                                int tlr = Random.Range(-1, 1);
-                                if((twr == -1 && tlr == -1) || (twr == 1 && tlr == 1) || (twr == 1 && tlr == -1) || (twr == -1 && tlr == 1))
-                                    continue;
-                                if(wr+twr > 0 && wr+twr < width-1 && lr + tlr > 0 && lr + tlr < length-1 && grid[wr + twr, lr + tlr] == null) {
-                                    grid[wr + twr, lr + tlr] = new List<TileType> { TileType.COIN };
-                                    pos_tokens.Add(new int[2] { wr+twr, lr+tlr });
-                                    break;
-                                }
-                            }
                             break;
-                        }
-                        else {
-                            for(int p = 0; p < v; p++) {
-                                if((System.Math.Abs(wr - pos_viruses[p][0]) + System.Math.Abs(lr - pos_viruses[p][1])) < 3) {
-                                    tooClose = true;
-                                    break;
-                                }
-                            }
-                            if (tooClose == false && grid[wr, lr] == null)
-                            {
-                                grid[wr, lr] = new List<TileType> { TileType.VIRUS };
-                                pos_viruses.Add(new int[2] { wr, lr });
-                                while (true) {
-                                    int twr = Random.Range(-1, 1);
-                                    int tlr = Random.Range(-1, 1);
-                                    if((twr == -1 && tlr == -1) || (twr == 1 && tlr == 1) || (twr == 1 && tlr == -1) || (twr == -1 && tlr == 1))
-                                        continue;
-                                    if(wr+twr > 0 && wr+twr < width-1 && lr + tlr > 0 && lr + tlr < length-1 && grid[wr + twr, lr + tlr] == null) {
-                                        grid[wr + twr, lr + tlr] = new List<TileType> { TileType.COIN };
-                                        pos_tokens.Add(new int[2] { wr+twr, lr+tlr });
-                                        break;
-                                    }
-                                }
-                                break;
-                            }
                         }
                     }
                 }
@@ -218,7 +213,7 @@ public class Level : MonoBehaviour
         
     }
 
-    bool DoWeHaveTooManyInteriorWalls(List<TileType>[,] grid)
+    bool TooManyInteriorWalls(List<TileType>[,] grid)
     {
         int[] number_of_assigned_elements = new int[] { 0, 0, 0, 0, 0 };
         for (int w = 0; w < width; w++)
@@ -236,7 +231,7 @@ public class Level : MonoBehaviour
             return false;
     }
 
-    bool DoWeHaveTooFewWalls(List<TileType>[,] grid)
+    bool TooFewWalls(List<TileType>[,] grid)
     {
         int[] number_of_potential_assignments = new int[] { 0, 0, 0, 0, 0 };
         for (int w = 0; w < width; w++)
@@ -290,7 +285,7 @@ public class Level : MonoBehaviour
         grid[w, l] = new List<TileType> { t };
 
 		// note that we negate the functions here i.e., check if we are consistent with the constraints we want
-        bool areWeConsistent = !DoWeHaveTooFewWalls(grid) && !DoWeHaveTooManyInteriorWalls(grid) && !TokeninCornerLike(grid);
+        bool areWeConsistent = !TooFewWalls(grid) && !TooManyInteriorWalls(grid) && !TokeninCornerLike(grid);
 
         grid[w, l] = new List<TileType>();
         grid[w, l].AddRange(old_assignment);
@@ -580,10 +575,11 @@ public class Level : MonoBehaviour
     void Update()
     {
         text_tokens.text = num_tokens_collected + " / " + num_tokens + " Tokens Retrieved";
+        text_box.GetComponent<Text>().text = "Find all the tokens and reach the Castle!";
         if(num_tokens == num_tokens_collected) {
             text_box.GetComponent<Text>().text = "Reach the Castle!";
         }
-
+    
         if (player_health < 0.001f) // the player dies here
         {
             text_box.GetComponent<Text>().text = "Failed!";
@@ -627,7 +623,7 @@ public class Level : MonoBehaviour
         // virus hits the players (boolean variable is manipulated by Virus.cs)
         if (virus_landed_on_player_recently)
         {
-            player_health -= Random.Range(0.25f, 0.5f);
+            player_health -= Random.Range(damage_multi*0.125f, damage_multi*0.25f);
             player_health = Mathf.Max(player_health, 0.0f);
             virus_landed_on_player_recently = false;
         }

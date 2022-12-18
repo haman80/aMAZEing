@@ -14,7 +14,7 @@ public class UI : MonoBehaviour
     }
     
     public void Normal() {
-        SceneManager.LoadScene("level");
+        SceneManager.LoadScene("Normal");
     }
 
     public void Easy() {
