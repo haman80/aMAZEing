@@ -41,7 +41,7 @@ public class Level : MonoBehaviour
     public AudioClip coin;
     public AudioClip drug;
     public AudioClip shielded;
-    public UI PlayAgain;
+    public GameObject PlayAgain;
     public GameObject tryAgain;
 
     // fields/variables accessible from other scripts
@@ -509,6 +509,19 @@ public class Level : MonoBehaviour
             }
         }
 
+        for(int i = 0; i < pos_mutants.Count; i++) {
+            minWallPath = dist[pos_mutants[i][0], pos_mutants[i][1]];
+            prevNode = prev[pos_mutants[i][0], pos_mutants[i][1]];
+            while(minWallPath != 0) {
+                if(solution[prevNode[0][0], prevNode[0][1]][0] == TileType.WALL) {
+                    solution[prevNode[0][0], prevNode[0][1]] = new List<TileType> { TileType.FLOOR };
+                    minWallPath--;
+                }
+                if(prevNode[0][0] == wr && prevNode[0][1] == lr) break;
+                prevNode = prev[prevNode[0][0], prevNode[0][1]];
+            }
+        }
+
         for(int i = 0; i < pos_drugs.Count; i++) {
             minWallPath = dist[pos_drugs[i][0], pos_drugs[i][1]];
             prevNode = prev[pos_drugs[i][0], pos_drugs[i][1]];
@@ -652,7 +665,7 @@ public class Level : MonoBehaviour
             cam.GetComponent<AudioListener>().enabled = true;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-            PlayAgain.Active();
+            PlayAgain.SetActive(true);
             return;
         }
         else if (player_entered_house && num_tokens_collected != num_tokens) {

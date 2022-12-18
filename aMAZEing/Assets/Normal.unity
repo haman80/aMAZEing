@@ -348,6 +348,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de9d879c4474c7a4a9c6cee32c460c89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HomePage: {fileID: 0}
+  ControlsPage: {fileID: 0}
 --- !u!1 &465358172
 GameObject:
   m_ObjectHideFlags: 0
@@ -2065,6 +2067,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de9d879c4474c7a4a9c6cee32c460c89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HomePage: {fileID: 0}
+  ControlsPage: {fileID: 0}
 --- !u!1 &1454129308
 GameObject:
   m_ObjectHideFlags: 0
@@ -3303,7 +3307,7 @@ MonoBehaviour:
   coin: {fileID: 8300000, guid: 1219e8aa13fb04f538c35b8d080bbc0a, type: 3}
   drug: {fileID: 8300000, guid: fe79a296241334099b9622427a36a916, type: 3}
   shielded: {fileID: 8300000, guid: 84526fd995a20401fa0c0fccf653c5e2, type: 3}
-  PlayAgain: {fileID: 98047947}
+  PlayAgain: {fileID: 98047943}
   tryAgain: {fileID: 1353457072}
 --- !u!23 &1919539188
 MeshRenderer:

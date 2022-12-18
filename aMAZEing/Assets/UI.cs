@@ -5,9 +5,8 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 public class UI : MonoBehaviour
 {
-    public void Active() {
-        gameObject.SetActive(true);
-    }
+    public GameObject HomePage;
+    public GameObject ControlsPage;
         
     public void Menu() {
         SceneManager.LoadScene("Menu");
@@ -23,5 +22,23 @@ public class UI : MonoBehaviour
 
     public void Hard() {
         SceneManager.LoadScene("Hard");
+    }
+
+    public void Controls() {
+        HomePage.SetActive(false);
+        ControlsPage.SetActive(true);
+    }
+
+    public void Return() {
+        HomePage.SetActive(true);
+        ControlsPage.SetActive(false);
+    }
+
+    public void Quit() {
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        #else
+        Application.Quit();
+        #endif
     }
 }
