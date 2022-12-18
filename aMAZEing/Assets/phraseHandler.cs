@@ -60,7 +60,6 @@ public class phraseHandler : MonoBehaviour
                 newText=newText+" " +"___";
             }
         }
-        Debug.Log(newText);
         fact_on_canvas.text = newText;
         savedText = newText;
     }
@@ -96,7 +95,6 @@ public class phraseHandler : MonoBehaviour
                 newText=newText+" " +"___";
             }
         }
-        Debug.Log(newText);
         fact_on_canvas.text = newText;
     }
     

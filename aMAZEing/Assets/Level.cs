@@ -663,6 +663,7 @@ public class Level : MonoBehaviour
         {
             Object.Destroy(fps_player_obj);
             cam.GetComponent<AudioListener>().enabled = true;
+            text_box.GetComponent<Text>().text = "Use this knowledge for your future battles, Chosen One";
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             PlayAgain.SetActive(true);

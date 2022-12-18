@@ -3319,7 +3319,7 @@ MonoBehaviour:
   length: 24
   storey_height: 2.5
   mutant_speed: 2.5
-  num_mutants: 5
+  num_mutants: 7
   num_tokens: 7
   damage_multi: 3
   fps_prefab: {fileID: 100006, guid: c6453f8e1f814744d8b94e5a6d1f9942, type: 3}
