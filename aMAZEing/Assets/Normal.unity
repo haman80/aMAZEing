@@ -3285,7 +3285,8 @@ MonoBehaviour:
   num_mutants: 5
   num_tokens: 5
   damage_multi: 2
-  fps_prefab: {fileID: 100006, guid: c6453f8e1f814744d8b94e5a6d1f9942, type: 3}
+  fps_prefab: {fileID: 5174621035664014782, guid: 81ab7fe46caf84939add69536eb57ec6,
+    type: 3}
   mutant_prefab: {fileID: 6813258842894415423, guid: c58b47733b6734f489c1fb0a0771065b,
     type: 3}
   house_prefab: {fileID: 1354419093465426, guid: fb6e45a6010fdae4b91b4ccbac21425e,

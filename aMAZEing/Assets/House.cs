@@ -33,4 +33,12 @@ public class House : MonoBehaviour
                 src.PlayOneShot(level.exit);
         }
     }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.name == "PLAYER")
+        {
+            level.player_entered_house = false;
+        }
+    }
 }

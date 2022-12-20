@@ -2177,8 +2177,23 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Move Forward: W\t   \tMove Backward: S\nMove Left: A\t                          
-    Move Right: D\nJump: Space\t                     Shift: Sprint\nEsc: Pause Menu\n"
+  m_text: 'Move Forward: Up Arrow
+
+    Move Backward: Down Arrow
+
+    Rotate Left:
+    Left Arrow
+
+    Rotate Right: Right Arrow
+
+    Crouch : Ctrl
+
+    Sprint: Shift
+
+    Pause
+    Menu: Esc
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2582,7 +2597,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'aMAZEING
+  m_text: 'aMAZEing
 
 '
   m_isRightToLeft: 0

@@ -18,23 +18,13 @@ public class Mutant : MonoBehaviour
     private bool flag = true;
     private float hit_time;
     private AudioSource src;
-    bool isCurrentlyColliding;
-    Vector3 lastValidPos;
-    Rigidbody m_Rigidbody;
     RaycastHit hit;
 
     // Start is called before the first frame update
     void Start()
     {
-        
-        m_Rigidbody = GetComponent<Rigidbody>();
         GameObject level_obj = GameObject.FindGameObjectWithTag("Level");
         level = level_obj.GetComponent<Level>();
-        if (level == null)
-        {
-            Debug.LogError("Internal error: could not find the Level object - did you remove its 'Level' tag?");
-            return;
-        }
         fps_player_obj = level.fps_player_obj;
         Bounds bounds = level.GetComponent<Collider>().bounds;
         radius_of_search_for_player = (bounds.size.x + bounds.size.z) / 15.0f;
@@ -68,25 +58,14 @@ public class Mutant : MonoBehaviour
             hit_time = Time.time;
             flag = false;
         }
-        if (!flag && Time.time-hit_time>0.3f){
+        if (!flag && Time.time-hit_time>0.25f){
             Destroy(gameObject);
         }
-        // if (!isCurrentlyColliding){
-        //     lastValidPos = transform.position;
-        // }
 
         Vector3 v = (fps_player_obj.transform.position - transform.position);
         Vector3 d = v/v.magnitude;
         d = new Vector3(d.x, 0f, d.z);
         d = d/d.magnitude;
-        // if (isCurrentlyColliding){
-        //     transform.forward = correction;
-        //     transform.position += correction * (mutant_speed * Time.deltaTime);
-        // }
-        // else{
-        //     transform.forward = d+correction;
-        //     d = d+correction;
-        // }
         if (correction.x==0.0f && correction.y==0.0f && correction.z==0.0f){
             d =d;
             d = d/d.magnitude;
@@ -100,11 +79,9 @@ public class Mutant : MonoBehaviour
             animation_controller.SetBool("isWalking", true);
             animation_controller.SetBool("isIdle", false);
             transform.position += d * (mutant_speed * Time.deltaTime);
-            // m_Rigidbody.MovePosition(transform.position+ d * (mutant_speed * Time.deltaTime));
         }
         if (v.magnitude<=2.5f){
             animation_controller.SetBool("isFighting", true);
-            // m_Rigidbody.MovePosition(transform.position+ d * (mutant_speed * Time.deltaTime));
             transform.position += d * (mutant_speed * Time.deltaTime);
         }
 
@@ -115,32 +92,19 @@ public class Mutant : MonoBehaviour
             animation_controller.SetBool("isWalking", false);
             animation_controller.SetBool("isIdle", true);
         }
-        // m_Rigidbody.MovePosition(new Vector3(transform.position.x, 0f, transform.position.z));
         transform.position = new Vector3(transform.position.x, 0f, transform.position.z);
         
     }
 
     
- 
-    private void OnCollisionExit(Collision col) {
-    if (col.gameObject.name == "WALL")
-        {
-            isCurrentlyColliding = false;
-        }
-    }
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.name == "PLAYER")
+        if (collision.gameObject.name == "PLAYER" && !hit_recently)
         {
             level.mutant_hit_player = true;
             hit_recently = true;
             src.PlayOneShot(level.infected);
             animation_controller.SetBool("isFighting", true);
-            //Destroy(gameObject);
-        }
-        if (collision.gameObject.name == "WALL")
-        {
-            isCurrentlyColliding = true;
         }
     }
 }

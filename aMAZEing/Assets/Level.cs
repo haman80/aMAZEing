@@ -19,7 +19,7 @@ public class Level : MonoBehaviour
     public int width = 24;   // size of level (default 16 x 16 blocks)
     public int length = 24;
     public float storey_height = 2.5f;   // height of walls
-    public float mutant_speed = 2.5f;     // virus velocity
+    public float mutant_speed = 2.5f;     // mutant velocity
     public int num_mutants = 5; 
     public int num_tokens = 5;  
     public int damage_multi = 0;
@@ -54,7 +54,7 @@ public class Level : MonoBehaviour
     internal bool mutant_hit_player = false;
 
     // fields/variables needed only from this script
-    private Bounds bounds;                   // size of ground plane in world space coordinates 
+    internal Bounds bounds;                   // size of ground plane in world space coordinates 
     private int function_calls = 0;          // number of function calls during backtracking for solving the CSP
     private List<int[]> pos_mutants;         // stores their location in the grid           
     private List<int[]> pos_tokens;
@@ -101,7 +101,8 @@ public class Level : MonoBehaviour
         player_health = 1.0f;
         shield_health = 0.0f;
         drug_landed_on_player_recently = false;
-        player_entered_house = false;  
+        player_entered_house = false;
+        mutant_hit_player = false;  
         num_tokens_collected = 0;   
         cam.GetComponent<AudioListener>().enabled = false;    
         dist = new int[width, length];
@@ -123,7 +124,6 @@ public class Level : MonoBehaviour
             bool success = false;        
             while (!success)
             {
-
                 for (int t = 0; t < num_tokens; t++)
                 {
                     while (true) 
@@ -210,9 +210,8 @@ public class Level : MonoBehaviour
                             grid[w, l] = new List<TileType> { TileType.WALL };
                         else
                         {
-                            if (grid[w, l] == null) // does not have virus already or some other assignment from previous run
+                            if (grid[w, l] == null)
                             {
-                                // CSP will involve assigning variables to one of the following four values (VIRUS is predefined for some tiles)
                                 List<TileType> candidate_assignments = new List<TileType> { TileType.WALL, TileType.FLOOR };
                                 Shuffle<TileType>(ref candidate_assignments);
 
@@ -354,7 +353,7 @@ public class Level : MonoBehaviour
         GetComponent<Renderer>().material.color = Color.grey; // ground plane will be grey
 
         // place character at random position (wr, lr) in terms of grid coordinates (integers)
-        // make sure that this random position is a FLOOR tile (not wall, drug, or virus)
+        // make sure that this random position is a FLOOR tile (not wall, drug, or mutant)
         int wr = 0;
         int lr = 0;
         if(wr_again != -1 && lr_again != -1) {
@@ -549,7 +548,7 @@ public class Level : MonoBehaviour
         }
 
         // the rest of the code creates the scenery based on the grid state 
-        // you don't need to modify this code (unless you want to replace the virus
+        // you don't need to modify this code (unless you want to replace the mutant
         // or other prefabs with something else you like)
         int w = 0;
         for (float x = bounds.min[0]; x < bounds.max[0]; x += bounds.size[0] / (float)width - 1e-6f, w++)
@@ -633,7 +632,6 @@ public class Level : MonoBehaviour
     void Update()
     {
         text_tokens.text = num_tokens_collected + " / " + num_tokens + " Tokens Retrieved";
-        text_box.GetComponent<Text>().text = "Find all the tokens and reach the Castle!";
         if(num_tokens == num_tokens_collected) {
             text_box.GetComponent<Text>().text = "Reach the Castle!";
         }
@@ -652,8 +650,6 @@ public class Level : MonoBehaviour
                 obj.Add(grave);
                 Object.Destroy(fps_player_obj);
                 cam.GetComponent<AudioListener>().enabled = true;                
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
                 tryAgain.SetActive(true);
             }
 
@@ -664,24 +660,15 @@ public class Level : MonoBehaviour
             Object.Destroy(fps_player_obj);
             cam.GetComponent<AudioListener>().enabled = true;
             text_box.GetComponent<Text>().text = "Use this knowledge for your future battles, Chosen One";
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
             PlayAgain.SetActive(true);
             return;
         }
         else if (player_entered_house && num_tokens_collected != num_tokens) {
             text_box.GetComponent<Text>().text = "Collect " + (num_tokens - num_tokens_collected) + " more token!";
-            player_entered_house = false;
         }
-
-        if(fps_player_obj.transform.position.y < -10) {
-            Object.Destroy(fps_player_obj);
-            TryAgain();
+        else if(!player_entered_house && num_tokens_collected != num_tokens) {
+            text_box.GetComponent<Text>().text = "Find all the tokens and reach the Castle!";
         }
-
-        // if(fps_player_obj.transform.position.y >= storey_height*1.5) {
-        //     fps_player_obj.transform.position = new Vector3(fps_player_obj.transform.position.x + .5f, storey_height,  fps_player_obj.transform.position.y+.5f);
-        // }
 
         if (mutant_hit_player){
             float damage = Random.Range(damage_multi*0.125f, damage_multi*0.25f);
